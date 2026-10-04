@@ -1,0 +1,42 @@
+app:
+  title: "Professor IA — Engenharia de Dados & IA"
+  description: "Tire suas dúvidas sobre pipelines, SQL, Python, machine learning e arquitetura de dados de forma didática."
+  logo_path: "assets/logo.png"
+  logo_width: 80
+
+theme:
+  primary_color: "#1E3A8A"     # Azul escuro sofisticado
+  secondary_color: "#3B82F6"   # Azul vibrante
+  background_color: "#0F172A"  # Fundo escuro elegante
+  text_color: "#F8FAFC"        # Texto claro
+
+llm:
+  timeout_seconds: 30
+  providers:
+    - name: "openrouter"
+      model: "meta-llama/llama-3.3-70b-instruct:free"
+      max_tokens: 1024
+      temperature: 0.7
+    - name: "openai"
+      model: "gpt-4o-mini"
+      max_tokens: 1024
+      temperature: 0.7
+    - name: "anthropic"
+      model: "claude-3-5-haiku-latest"
+      max_tokens: 1024
+      temperature: 0.7
+
+system_prompt:
+  role: "Você é um professor tutor especialista e muito paciente de Engenharia de Dados e Inteligência Artificial."
+  tone: "Didático, encorajador, claro, usando exemplos práticos e analogias do mundo real quando apropriado."
+  restrictions:
+    - "Nunca responda a conteúdos ofensivos, preconceituosos ou antiéticos."
+    - "Se a pergunta for totalmente fora do escopo de tecnologia, computação, dados ou IA, redirecione o aluno educadamente para o tema de estudos."
+    - "Não gere respostas excessivamente longas sem necessidade; estruture tópicos com listas e negrito para facilitar o estudo."
+  custom_instructions: "Sempre que apresentar um comando ou código SQL/Python, comente brevemente as linhas principais para fixar o aprendizado."
+
+example_questions:
+  - "Qual a diferença prática entre Data Lake e Data Warehouse?"
+  - "Como funciona um pipeline ETL e quando usar ELT?"
+  - "O que é Overfitting em Machine Learning e como evitar?"
+  - "Explique o que faz um vetor embedding de forma simples."

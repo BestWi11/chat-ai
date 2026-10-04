@@ -1,0 +1,64 @@
+name: CI/CD Pipeline - Validação e Deploy no Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate-and-test:
+    name: 🛡️ Portão de Testes e Validação
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Clonar Repositório
+        uses: actions/checkout@v4
+
+      - name: 🐍 Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: 📦 Instalar Dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🔍 Executar Portão de Qualidade (validate_config.py)
+        run: |
+          python validate_config.py
+
+      - name: 🧪 Executar Suíte de Testes (pytest)
+        run: |
+          pytest -v
+
+  deploy-huggingface:
+    name: 🚀 Sincronizar com Hugging Face Spaces
+    needs: validate-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Clonar Repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: 🚀 Fazer Deploy no Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "❌ ERRO: A secret 'HF_TOKEN' não foi configurada nas configurações do GitHub (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+          echo "Configurando remote do Hugging Face..."
+          git config --global user.email "ci-bot@github.com"
+          git config --global user.name "GitHub Actions CI"
+
+          git push --force https://BestWill:$HF_TOKEN@huggingface.co/spaces/BestWill/chat-ai-personalizado main
+          echo "🎉 Deploy concluído com sucesso no Hugging Face Spaces!"

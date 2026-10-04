@@ -1,0 +1,24 @@
+
+-------------------------------------------------chat de AI personalizado
+
+--criar venv
+conda create --name chat-ai
+
+------------------------------------
+--criar repositorio no github
+gh repo create chat-ai
+
+-- entrar na pasta
+cd chat-ai
+
+
+--no github
+entra no github e confere se criou
+
+
+
+
+
+
+
+
