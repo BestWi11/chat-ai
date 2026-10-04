@@ -180,11 +180,22 @@ def index_documents(
 
 
 def main():
+    default_chunk_size = 1200
+    default_overlap = 100
+    try:
+        from src.config_loader import load_config
+        cfg = load_config()
+        if hasattr(cfg, "rag") and cfg.rag:
+            default_chunk_size = cfg.rag.chunk_size
+            default_overlap = cfg.rag.chunk_overlap
+    except Exception:
+        pass
+
     parser = argparse.ArgumentParser(description="Indexador de documentos Markdown para Supabase pgvector.")
     parser.add_argument("--docs-dir", default="documentos", help="Diretório dos arquivos .md (default: documentos)")
     parser.add_argument("--version", default=None, help="ID da versão do índice (default: commit git ou timestamp)")
-    parser.add_argument("--chunk-size", type=int, default=500, help="Tamanho máximo de cada chunk em caracteres (default: 500)")
-    parser.add_argument("--chunk-overlap", type=int, default=50, help="Sobreposição entre chunks (default: 50)")
+    parser.add_argument("--chunk-size", type=int, default=default_chunk_size, help=f"Tamanho máximo de cada chunk (default: {default_chunk_size})")
+    parser.add_argument("--chunk-overlap", type=int, default=default_overlap, help=f"Sobreposição entre chunks (default: {default_overlap})")
     parser.add_argument("--batch-size", type=int, default=50, help="Tamanho do lote de inserção no banco (default: 50)")
     parser.add_argument("--no-clean", action="store_true", help="Não apagar chunks anteriores com a mesma versão")
 

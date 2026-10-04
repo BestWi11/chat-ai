@@ -14,27 +14,27 @@ llm:
   timeout_seconds: 30
   providers:
     - name: "openrouter"
-      model: "openrouter/free"
-      max_tokens: 1024
-      temperature: 0.7
-    - name: "openrouter"
       model: "qwen/qwen3.8-27b:free"
       max_tokens: 1024
-      temperature: 0.7
+      temperature: 0.5
     - name: "openrouter"
-      model: "nvidia/nemotron-3-super-120b-a12b:free"
+      model: "meta-llama/llama-3.3-70b-instruct:free"
       max_tokens: 1024
-      temperature: 0.7
+      temperature: 0.5
     - name: "openrouter"
       model: "google/gemma-4-31b-it:free"
       max_tokens: 1024
-      temperature: 0.7
+      temperature: 0.5
+    - name: "openrouter"
+      model: "openrouter/free"
+      max_tokens: 1024
+      temperature: 0.5
 
 rag:
   enabled: true
-  chunk_size: 500              # Tamanho máximo do trecho em caracteres (200 a 2000)
-  chunk_overlap: 50            # Sobreposição entre trechos consecutivos (0 a chunk_size/2)
-  top_k: 3                     # Quantidade de trechos enviados ao LLM (1 a 10)
+  chunk_size: 1200             # Tamanho ampliado para manter seções completas sem cortar tópicos
+  chunk_overlap: 100           # Sobreposição entre trechos consecutivos
+  top_k: 4                     # Envia os 4 trechos mais relevantes ao LLM
   vector_weight: 0.6           # Peso da busca semântica no RRF (0.0 a 1.0)
   text_weight: 0.4             # Peso da busca por palavras-chave no RRF (0.0 a 1.0)
   min_relevance_score: 0.005   # Limiar mínimo no score RRF para considerar o trecho relevante
@@ -44,11 +44,11 @@ rag:
 
 system_prompt:
   role: "Você é um professor tutor especialista e muito paciente de Engenharia de Dados e Inteligência Artificial."
-  tone: "Didático, encorajador, claro, usando exemplos práticos e analogias do mundo real quando apropriado."
+  tone: "Didático, encorajador, claro, falando sempre em Português do Brasil com excelente formatação visual."
   restrictions:
     - "Nunca responda a conteúdos ofensivos, preconceituosos ou antiéticos."
-    - "Baseie suas respostas estritamente no material didático disponibilizado. Se o assunto não constar no material, diga apenas que não encontrou isso no material do curso."
-    - "Não gere respostas excessivamente longas sem necessidade; estruture tópicos com listas e negrito para facilitar o estudo."
+    - "Responda SEMPRE e exclusivamente em Português do Brasil. NUNCA exiba rascunhos mentais, 'thinking process' ou análises em inglês."
+    - "Baseie suas respostas no material didático do curso com profundidade didática e clareza. Use listas e negrito para organizar o estudo."
   custom_instructions: "Sempre que apresentar um comando ou código SQL/Python, comente brevemente as linhas principais para fixar o aprendizado."
 
 example_questions:

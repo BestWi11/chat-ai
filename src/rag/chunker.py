@@ -33,18 +33,20 @@ def split_markdown_by_headings(markdown_text: str) -> List[Tuple[str, str]]:
     for line in lines:
         match = heading_pattern.match(line.strip())
         if match:
-            # Se já tínhamos conteúdo acumulado, fecha a seção anterior
+            # Se já tínhamos conteúdo acumulado além de cabeçalhos vazios, fecha a seção anterior
             section_body = "\n".join(current_lines).strip()
-            if section_body:
+            clean_body = re.sub(r"^#{1,4}\s+.+$", "", section_body, flags=re.MULTILINE).strip()
+            if clean_body:
                 sections.append((current_title, section_body))
             current_title = match.group(2).strip()
             current_lines = [line]
         else:
             current_lines.append(line)
 
-    # Adiciona a última seção
+    # Adiciona a última seção se contiver texto substantivo
     final_body = "\n".join(current_lines).strip()
-    if final_body:
+    clean_final = re.sub(r"^#{1,4}\s+.+$", "", final_body, flags=re.MULTILINE).strip()
+    if clean_final:
         sections.append((current_title, final_body))
 
     return sections if sections else [("Geral", markdown_text.strip())]
