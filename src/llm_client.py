@@ -38,12 +38,14 @@ class LLMClient:
         from openai import OpenAI
 
         if provider.name == "openrouter":
+            # Cabeçalhos HTTP exigem caracteres ASCII puros
+            safe_title = self.config.app.title.encode("ascii", "ignore").decode("ascii") or "Chat-AI"
             client = OpenAI(
                 base_url="https://openrouter.ai/api/v1",
                 api_key=api_key,
                 default_headers={
                     "HTTP-Referer": "https://huggingface.co/spaces/BestWill/chat-ai-personalizado",
-                    "X-Title": self.config.app.title
+                    "X-Title": safe_title
                 }
             )
         else:

@@ -14,15 +14,19 @@ llm:
   timeout_seconds: 30
   providers:
     - name: "openrouter"
-      model: "meta-llama/llama-3.3-70b-instruct:free"
+      model: "openrouter/free"
       max_tokens: 1024
       temperature: 0.7
-    - name: "openai"
-      model: "gpt-4o-mini"
+    - name: "openrouter"
+      model: "qwen/qwen3.8-27b:free"
       max_tokens: 1024
       temperature: 0.7
-    - name: "anthropic"
-      model: "claude-3-5-haiku-latest"
+    - name: "openrouter"
+      model: "nvidia/nemotron-3-super-120b-a12b:free"
+      max_tokens: 1024
+      temperature: 0.7
+    - name: "openrouter"
+      model: "google/gemma-4-31b-it:free"
       max_tokens: 1024
       temperature: 0.7
 

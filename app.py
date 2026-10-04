@@ -4,6 +4,19 @@ Compatível com execução local e Hugging Face Spaces (Porta 7860).
 """
 
 import sys
+
+# Patch de compatibilidade entre Pydantic v2.10+ (boolean additionalProperties) e Gradio 4
+try:
+    import gradio_client.utils
+    _orig_schema = gradio_client.utils._json_schema_to_python_type
+    def _safe_schema(schema, defs=None):
+        if isinstance(schema, bool):
+            return "Any"
+        return _orig_schema(schema, defs)
+    gradio_client.utils._json_schema_to_python_type = _safe_schema
+except Exception:
+    pass
+
 from src.config_loader import load_config, ConfigValidationError
 from src.ui import create_ui
 
@@ -23,7 +36,7 @@ def main():
         server_name="0.0.0.0",
         server_port=7860,
         show_api=False,
-        share=False
+        share=True
     )
 
 

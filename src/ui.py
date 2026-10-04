@@ -156,29 +156,30 @@ def create_ui(config: AssistantConfig) -> gr.Blocks:
         # Handlers de conversação
         def user_message(user_msg: str, chat_history: List[Tuple[str, str]]):
             if not user_msg or not user_msg.strip():
-                return "", chat_history
-            updated_history = chat_history + [(user_msg, "")]
-            return "", updated_history
+                return "", chat_history or []
+            history = list(chat_history) if chat_history else []
+            return "", history + [(user_msg.strip(), "")]
 
         def bot_response(chat_history: List[Tuple[str, str]]) -> Generator[List[Tuple[str, str]], None, None]:
             if not chat_history:
                 return
 
-            user_msg = chat_history[-1][0]
+            history = list(chat_history)
+            user_msg = str(history[-1][0])
             # Monta histórico estruturado para a API
             api_history = []
-            for u, b in chat_history[:-1]:
+            for u, b in history[:-1]:
                 if u:
-                    api_history.append({"role": "user", "content": u})
+                    api_history.append({"role": "user", "content": str(u)})
                 if b:
-                    api_history.append({"role": "assistant", "content": b})
+                    api_history.append({"role": "assistant", "content": str(b)})
             api_history.append({"role": "user", "content": user_msg})
 
             accumulated_response = ""
             for chunk in llm_client.stream_chat(api_history):
                 accumulated_response += chunk
-                chat_history[-1] = (user_msg, accumulated_response)
-                yield chat_history
+                history[-1] = (user_msg, accumulated_response)
+                yield history
 
         # Eventos do botão Enviar e tecla Enter
         msg_input.submit(
@@ -212,11 +213,14 @@ def create_ui(config: AssistantConfig) -> gr.Blocks:
         # Eventos para os botões de perguntas sugeridas
         if config.example_questions:
             for btn, q_text in example_buttons:
-                def set_and_submit(text=q_text, chat_h=[]):
-                    return "", chat_h + [(text, "")]
+                def make_example_handler(prompt_text: str):
+                    def handle_example_click(chat_h):
+                        curr = list(chat_h) if chat_h else []
+                        return "", curr + [(prompt_text, "")]
+                    return handle_example_click
 
                 btn.click(
-                    set_and_submit,
+                    make_example_handler(q_text),
                     inputs=[chatbot],
                     outputs=[msg_input, chatbot],
                     queue=False
