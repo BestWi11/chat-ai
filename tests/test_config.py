@@ -116,3 +116,43 @@ def test_system_prompt_builder():
     assert "IDENTIDADE E PAPEL:" in prompt
     assert "TOM DE VOZ:" in prompt
     assert config.system_prompt.role in prompt
+
+
+def test_rag_config_in_default_config():
+    """Testa se o bloco rag carregado no config.yaml padrão está correto."""
+    config = load_config("config.yaml")
+    assert config.rag is not None
+    assert config.rag.enabled is True
+    assert 200 <= config.rag.chunk_size <= 2000
+    assert 0 <= config.rag.chunk_overlap <= (config.rag.chunk_size // 2)
+    assert 1 <= config.rag.top_k <= 10
+    assert 0.0 <= config.rag.vector_weight <= 1.0
+    assert 0.0 <= config.rag.text_weight <= 1.0
+    assert config.rag.min_relevance_score >= 0.0
+    assert 0.50 <= config.rag.hit_rate_threshold <= 1.00
+
+
+def test_rag_config_overlap_too_large(tmp_path):
+    """Testa se erro é lançado quando chunk_overlap > chunk_size // 2."""
+    bad_rag_file = tmp_path / "bad_rag.yaml"
+    content = """
+app:
+  title: "Teste"
+  description: "Desc"
+llm:
+  providers:
+    - name: "openrouter"
+      model: "test-model"
+system_prompt:
+  role: "Professor"
+  tone: "Didático"
+rag:
+  enabled: true
+  chunk_size: 400
+  chunk_overlap: 250  # Inválido: > 200 (metade de 400)
+"""
+    bad_rag_file.write_text(content, encoding="utf-8")
+    with pytest.raises(ConfigValidationError) as exc:
+        load_config(str(bad_rag_file))
+    assert "não pode ser maior que a metade de chunk_size" in str(exc.value)
+

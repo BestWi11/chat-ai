@@ -88,10 +88,35 @@ class SystemPromptConfig(BaseModel):
         return "\n\n".join(lines)
 
 
+class RAGConfig(BaseModel):
+    enabled: bool = Field(default=True, description="Habilita ou desabilita o RAG")
+    chunk_size: int = Field(default=500, ge=200, le=2000, description="Tamanho do chunk em caracteres")
+    chunk_overlap: int = Field(default=50, ge=0, description="Sobreposição entre chunks")
+    top_k: int = Field(default=3, ge=1, le=10, description="Quantidade de trechos recuperados")
+    vector_weight: float = Field(default=0.6, ge=0.0, le=1.0, description="Peso da busca vetorial")
+    text_weight: float = Field(default=0.4, ge=0.0, le=1.0, description="Peso da busca textual")
+    min_relevance_score: float = Field(default=0.005, ge=0.0, description="Pontuação mínima de corte RRF")
+    hit_rate_threshold: float = Field(default=0.80, ge=0.50, le=1.00, description="Limiar mínimo do Hit Rate")
+    web_search_fallback: bool = Field(default=True, description="Busca na web fontes confiáveis se não constar na apostila")
+    embedding_model: str = Field(
+        default="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        description="Nome do modelo de embeddings"
+    )
+
+    @model_validator(mode="after")
+    def validate_overlap(self) -> "RAGConfig":
+        if self.chunk_overlap > (self.chunk_size // 2):
+            raise ValueError(
+                f"chunk_overlap ({self.chunk_overlap}) não pode ser maior que a metade de chunk_size ({self.chunk_size // 2})."
+            )
+        return self
+
+
 class AssistantConfig(BaseModel):
     app: AppConfig
     theme: ThemeConfig = Field(default_factory=ThemeConfig)
     llm: LLMConfig
+    rag: RAGConfig = Field(default_factory=RAGConfig)
     system_prompt: SystemPromptConfig
     example_questions: List[str] = Field(default_factory=list, max_length=10)
 

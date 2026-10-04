@@ -50,8 +50,8 @@ def run_quality_gate(config_path: str = "config.yaml") -> bool:
 
     has_error = False
 
-    # 1. Teste de Configuração (T1 a T4)
-    print("\n🔍 [1/2] Validando sintaxe e regras do 'config.yaml'...")
+    # 1. Teste de Configuração (T1 a T4 e T11)
+    print("\n🔍 [1/3] Validando sintaxe e regras do 'config.yaml'...")
     try:
         config = load_config(config_path)
         print(f"  ✅ [T1] Sintaxe YAML válida.")
@@ -62,13 +62,43 @@ def run_quality_gate(config_path: str = "config.yaml") -> bool:
         else:
             print(f"  ℹ️  [T4] Nenhum logo configurado (opcional).")
         print(f"  🤖 Provedor principal: {config.llm.providers[0].name} ({config.llm.providers[0].model})")
+        print(f"  ✅ [T11] Schema RAG validado (Ativo: {config.rag.enabled}, Top-K: {config.rag.top_k}, Chunk: {config.rag.chunk_size})")
     except ConfigValidationError as err:
         print(f"\n❌ ERRO NA CONFIGURAÇÃO:")
         print(f"{err}")
         has_error = True
 
-    # 2. Teste de Vazamento de Segredos (T5)
-    print("\n🔐 [2/2] Verificando segurança contra vazamento de chaves de API...")
+    # 2. Teste de Documentos Markdown (T10)
+    print("\n📚 [2/3] Validando integridade dos documentos Markdown (documentos/)...")
+    docs_dir = "documentos"
+    if not os.path.exists(docs_dir):
+        print(f"  ❌ [T10] Pasta '{docs_dir}' não encontrada!")
+        has_error = True
+    else:
+        files = os.listdir(docs_dir)
+        md_files = [f for f in files if f.endswith(".md")]
+        non_md = [f for f in files if not f.endswith(".md") and not f.startswith(".")]
+        if non_md:
+            print(f"  ❌ [T10] Arquivos não-Markdown encontrados em '{docs_dir}': {non_md}")
+            has_error = True
+        elif not md_files:
+            print(f"  ❌ [T10] Nenhum documento Markdown (.md) encontrado em '{docs_dir}'!")
+            has_error = True
+        else:
+            # Verifica se algum está vazio
+            empty_files = []
+            for mf in md_files:
+                p = os.path.join(docs_dir, mf)
+                if os.path.getsize(p) == 0:
+                    empty_files.append(mf)
+            if empty_files:
+                print(f"  ❌ [T10] Documentos vazios detectados: {empty_files}")
+                has_error = True
+            else:
+                print(f"  ✅ [T10] {len(md_files)} documentos Markdown válidos encontrados em '{docs_dir}'.")
+
+    # 3. Teste de Vazamento de Segredos (T5)
+    print("\n🔐 [3/3] Verificando segurança contra vazamento de chaves de API...")
     leaks = check_for_secret_leaks(".")
     if leaks:
         print("\n❌ ALERTA CRÍTICO DE SEGURANÇA: Chaves de API detectadas nos arquivos:")

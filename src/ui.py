@@ -116,6 +116,17 @@ def create_ui(config: AssistantConfig) -> gr.Blocks:
                 )
             gr.HTML(f"<h1 class='header-title'>{config.app.title}</h1>")
             gr.HTML(f"<p class='header-desc'>{config.app.description}</p>")
+            if config.rag.enabled:
+                gr.HTML(
+                    """
+                    <div style='margin-top: 8px;'>
+                        <span style='display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #93C5FD; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;'>
+                            <span style='width: 8px; height: 8px; border-radius: 50%; background: #10B981; display: inline-block; box-shadow: 0 0 6px #10B981;'></span>
+                            Base de Conhecimento RAG Ativa (Apostilas do Curso)
+                        </span>
+                    </div>
+                    """
+                )
 
         # Chatbot
         chatbot = gr.Chatbot(

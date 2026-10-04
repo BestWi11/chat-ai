@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Validação e Deploy no Hugging Face Spaces
+name: CI/CD Pipeline - Validação, Indexação RAG e Deploy
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate-and-test:
-    name: 🛡️ Portão de Testes e Validação
+    name: 🛡️ [Job 1] Portão de Qualidade e Testes Unitários
     runs-on: ubuntu-latest
 
     steps:
@@ -26,17 +26,63 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 🔍 Executar Portão de Qualidade (validate_config.py)
+      - name: 🔍 Executar Portão de Configuração e Documentos (validate_config.py)
         run: |
           python validate_config.py
 
-      - name: 🧪 Executar Suíte de Testes (pytest)
+      - name: 🧪 Executar Suíte de Testes Unitários (pytest)
         run: |
           pytest -v
 
-  deploy-huggingface:
-    name: 🚀 Sincronizar com Hugging Face Spaces
+  index-and-evaluate-rag:
+    name: 🧠 [Job 2 & 3] Indexação RAG e Portão de Avaliação (Supabase)
     needs: validate-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Clonar Repositório
+        uses: actions/checkout@v4
+
+      - name: 🐍 Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: 📦 Instalar Dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🚀 Executar Indexação e Avaliação Automatizada (Hit Rate@3 & MRR)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "⚠️ AVISO: 'SUPABASE_URL' ou 'SUPABASE_SERVICE_ROLE_KEY' não configuradas nas Secrets do GitHub."
+            echo "👉 Para habilitar a reindexação automática a cada push, adicione essas variáveis em:"
+            echo "   Settings > Secrets and variables > Actions > New repository secret."
+            echo "ℹ️  Pulando a etapa de indexação remota. O Space usará a versão ativa atual."
+            exit 0
+          fi
+
+          # Gera identificador de versão baseado no commit curto
+          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          VERSION_ID="v_${COMMIT_HASH}"
+          echo "🏷️  Versão do índice: $VERSION_ID"
+
+          echo "📂 [Job 2] Fatiando e indexando documentos Markdown no Supabase..."
+          python scripts/index_docs.py --version "$VERSION_ID"
+
+          echo "🎯 [Job 3] Avaliando acurácia do novo índice com tests/eval_questions.json..."
+          python scripts/eval_rag.py --version "$VERSION_ID" --threshold 0.80 --promote
+
+  deploy-huggingface:
+    name: 🚀 [Job 4] Sincronizar com Hugging Face Spaces
+    needs: [validate-and-test, index-and-evaluate-rag]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "eval-01",
+    "question": "Como eu configuro o modelo de IA no arquivo config.yaml?",
+    "expected_document": "parte-01-fundamentos.md",
+    "expected_section": "Contrato do config.yaml"
+  },
+  {
+    "id": "eval-02",
+    "question": "O que acontece se uma chave de API for colocada no código por engano?",
+    "expected_document": "parte-01-fundamentos.md",
+    "expected_section": "Segurança e Portão de Testes"
+  },
+  {
+    "id": "eval-03",
+    "question": "Qual a diferença entre Data Lake e Data Warehouse?",
+    "expected_document": "parte-02-engenharia-rag.md",
+    "expected_section": "Arquiteturas de Dados"
+  },
+  {
+    "id": "eval-04",
+    "question": "Como funciona o algoritmo de fusão RRF na busca híbrida?",
+    "expected_document": "parte-02-engenharia-rag.md",
+    "expected_section": "Busca Híbrida e RRF"
+  },
+  {
+    "id": "eval-05",
+    "question": "Onde ficam guardadas as chaves de API no Hugging Face?",
+    "expected_document": "parte-01-fundamentos.md",
+    "expected_section": "Publicação e Deploy"
+  },
+  {
+    "id": "eval-06",
+    "question": "O que significa a sigla RAG e qual o seu objetivo?",
+    "expected_document": "parte-02-engenharia-rag.md",
+    "expected_section": "O que é RAG"
+  },
+  {
+    "id": "eval-07",
+    "question": "Por que os documentos são fatiados em chunks com sobreposição?",
+    "expected_document": "parte-02-engenharia-rag.md",
+    "expected_section": "Fatiamento de Documentos e Chunking"
+  },
+  {
+    "id": "eval-08",
+    "question": "Como o assistente reage quando um provedor de IA falha?",
+    "expected_document": "parte-01-fundamentos.md",
+    "expected_section": "Modelos de IA e Sistema de Fallback"
+  },
+  {
+    "id": "eval-09",
+    "question": "O que é a arquitetura medalhão no Databricks e quais suas camadas?",
+    "expected_document": "databricks-lakehouse.md",
+    "expected_section": "Arquitetura Medalhão"
+  },
+  {
+    "id": "eval-10",
+    "question": "Qual a diferença entre transformações narrow e wide no PySpark?",
+    "expected_document": "sql-python-dados.md",
+    "expected_section": "Apache Spark e PySpark: Transformações Narrow vs Wide"
+  },
+  {
+    "id": "eval-11",
+    "question": "O que é Overfitting em Machine Learning e como evitar?",
+    "expected_document": "machine-learning-ia.md",
+    "expected_section": "O Dilema Viés-Variância: Overfitting e Underfitting"
+  },
+  {
+    "id": "eval-12",
+    "question": "Qual a diferença entre ETL e ELT na Engenharia de Dados?",
+    "expected_document": "engenharia-de-dados-pipelines.md",
+    "expected_section": "ETL vs ELT: Diferenças e Casos de Uso"
+  }
+]

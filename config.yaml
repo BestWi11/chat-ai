@@ -30,17 +30,30 @@ llm:
       max_tokens: 1024
       temperature: 0.7
 
+rag:
+  enabled: true
+  chunk_size: 500              # Tamanho máximo do trecho em caracteres (200 a 2000)
+  chunk_overlap: 50            # Sobreposição entre trechos consecutivos (0 a chunk_size/2)
+  top_k: 3                     # Quantidade de trechos enviados ao LLM (1 a 10)
+  vector_weight: 0.6           # Peso da busca semântica no RRF (0.0 a 1.0)
+  text_weight: 0.4             # Peso da busca por palavras-chave no RRF (0.0 a 1.0)
+  min_relevance_score: 0.005   # Limiar mínimo no score RRF para considerar o trecho relevante
+  hit_rate_threshold: 0.80     # Limiar mínimo de acurácia no portão de CI/CD (80%)
+  web_search_fallback: true    # Pesquisa na internet fontes confiáveis caso não conste na apostila
+  embedding_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
 system_prompt:
   role: "Você é um professor tutor especialista e muito paciente de Engenharia de Dados e Inteligência Artificial."
   tone: "Didático, encorajador, claro, usando exemplos práticos e analogias do mundo real quando apropriado."
   restrictions:
     - "Nunca responda a conteúdos ofensivos, preconceituosos ou antiéticos."
-    - "Se a pergunta for totalmente fora do escopo de tecnologia, computação, dados ou IA, redirecione o aluno educadamente para o tema de estudos."
+    - "Baseie suas respostas estritamente no material didático disponibilizado. Se o assunto não constar no material, diga apenas que não encontrou isso no material do curso."
     - "Não gere respostas excessivamente longas sem necessidade; estruture tópicos com listas e negrito para facilitar o estudo."
   custom_instructions: "Sempre que apresentar um comando ou código SQL/Python, comente brevemente as linhas principais para fixar o aprendizado."
 
 example_questions:
-  - "Qual a diferença prática entre Data Lake e Data Warehouse?"
-  - "Como funciona um pipeline ETL e quando usar ELT?"
-  - "O que é Overfitting em Machine Learning e como evitar?"
-  - "Explique o que faz um vetor embedding de forma simples."
+  - "Qual a diferença entre Data Lake e Data Warehouse?"
+  - "O que é RAG e como funciona a busca híbrida?"
+  - "Como configuro os modelos no config.yaml?"
+  - "Por que os documentos são fatiados em chunks com sobreposição?"
+
